@@ -46,7 +46,7 @@ const UserList = () => {
                   </td>
                   <td>
                     <span>
-                      <FaTrashAlt size={20} color="red" />
+                      <FaTrashAlt size={20} color="red" />  
                     </span>
                   </td>
                 </tr>
