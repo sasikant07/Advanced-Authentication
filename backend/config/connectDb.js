@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 // import colors from "colors";
 
-const connectDb = async () => {
+const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URL);
         console.log(`Server Running On ${mongoose.connection.host}`.bgCyan.white);
@@ -10,4 +10,4 @@ const connectDb = async () => {
     }
 }
 
-export default connectDb;
+export default connectDB;
