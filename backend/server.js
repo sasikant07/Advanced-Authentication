@@ -3,8 +3,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import connectDb from "./config/connectDb.js";
+import connectDB from "./config/connectDB.js";
 import userRoute from "./routes/userRoute.js";
+import errorHandler from "./middleware/errorMiddleware.js";
 
 dotenv.config();
 
@@ -27,11 +28,13 @@ app.get("/", (req, res) => {
     res.send("Home Page");
 });
 
+// Error Handler
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8080;
 
 /* MONGOOSE SETUP */
-connectDb();
+connectDB();
 
 //Listeners
 app.listen(PORT, () => {
