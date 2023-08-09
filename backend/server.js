@@ -38,7 +38,7 @@ connectDB();
 
 //Listeners
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Node Server running on port ${PORT}`);
 });
 
 // mongoose.connect(process.env.MONGO_URI)
