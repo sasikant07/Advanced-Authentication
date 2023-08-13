@@ -4,6 +4,7 @@ import parser from "ua-parser-js";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import { generateToken } from "../utlls/index.js";
+import sendEmail from "../utlls/sendEmail.js";
 
 // Register User
 export const registerUser = asyncHandler(async (req, res) => {
@@ -233,4 +234,36 @@ export const upgradeUser = asyncHandler (async (req, res) => {
     await user.save();
 
     res.status(200).json({message: `User role updated to ${role}`});
+})
+
+// Send Automated Emails
+export const sendAutomatedEmail = asyncHandler (async (req, res) => {
+    const {subject, send_to, reply_to, template, url} = req.body;
+
+    if (!subject || !send_to || !reply_to || !template) {
+        es.status(500);
+        throw new Error("Missing Email Parameter!");
+    }
+
+    // Get User
+    const user = await User.findOne({email: send_to});
+
+    if (!user) {
+        res.status(404);
+        throw new Error("User Not Found!");
+    }
+
+    const sent_from = process.env.EMAIL_USER;
+    const name = user.name;
+    const link = `${process.env.FRONTEND_URL}${url}`;
+
+    try {
+        await sendEmail(subject, send_to, sent_from, reply_to, template, name, link);
+
+        res.status(200).json({message: "Email Sent!"});
+    } catch (error) {
+        res.status(500);
+        throw new Error("Email not sent. Please try again!");
+    }
+
 })
