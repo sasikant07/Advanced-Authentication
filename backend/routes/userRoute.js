@@ -10,7 +10,14 @@ import {
     getUsers, 
     loginStatus, 
     upgradeUser, 
-    sendAutomatedEmail
+    sendAutomatedEmail,
+    sendVerificationEmail,
+    verifyUser,
+    forgotPassword,
+    resetPassword,
+    changePassword,
+    sendLoginCode,
+    loginWithCode
 } from "../controllers/userController.js";
 import { adminOnly, authorOnly, protect } from "../middleware/authMiddleware.js";
 
@@ -27,6 +34,14 @@ router.post("/upgradeUser", protect, adminOnly, upgradeUser);
 
 // Email ROutes
 router.post("/sendAutomatedEmail", protect, sendAutomatedEmail);
+router.post("/sendVerificationEmail", protect, sendVerificationEmail);
+router.patch("/verifyUser/:verificationToken", verifyUser);
+router.post("/forgotPassword", forgotPassword);
+router.patch("/resetPassword/:resetToken", resetPassword);
+router.patch("/changePassword", protect, changePassword);
+
+router.post("/sendLoginCode/:email", sendLoginCode);
+router.post("/loginWithCode/:email", loginWithCode);
 
 
 export default router;
