@@ -6,6 +6,8 @@ import {Link} from "react-router-dom";
 import styles from "./auth.module.scss";
 import Card from '../../components/card/Card';
 import PasswordInput from '../../components/passwordInput/PasswordInput';
+import { toast } from 'react-toastify';
+import { validateEmail } from '../../redux/features/auth/authService';
 
 const initialState = {
     name: "",
@@ -70,7 +72,27 @@ const Register = () => {
     }, [password])
 
     const registerUser = (e) => {
+        e.preventDefault();
 
+        if (!name || !email || !password) {
+            return toast.error("All fields are required");
+        }
+
+        if (password.length < 6) {
+            return toast.error("Password must be upto 6 char");
+        }
+
+        if (!validateEmail(email)) {
+            return toast.error("Please enter a valid email");
+        }
+
+        if (password !== password2) {
+            return toast.error("Passwords doesn't match");
+        }
+
+        const userData = { name, email, password };
+
+        console.log(userData);
     }
 
   return (
@@ -108,6 +130,11 @@ const Register = () => {
                         placeholder="Confirm Password" 
                         value={password2} 
                         onChange={handleInputChange}
+                        onPaste={(e) => {
+                            e.preventDefault();
+                            toast.error("cannot paste into unput field");
+                            return false;
+                        }}
                     />
 
                     {/* Password Strength */}
