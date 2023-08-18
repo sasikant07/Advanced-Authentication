@@ -2,12 +2,15 @@ import React, {useEffect, useState} from 'react';
 import {TiUserAddOutline} from "react-icons/ti";
 import {FaTimes} from "react-icons/fa";
 import {BsCheck2All} from "react-icons/bs";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import { toast } from 'react-toastify';
+import {useSelector, useDispatch} from "react-redux";
+
 import styles from "./auth.module.scss";
 import Card from '../../components/card/Card';
 import PasswordInput from '../../components/passwordInput/PasswordInput';
-import { toast } from 'react-toastify';
 import { validateEmail } from '../../redux/features/auth/authService';
+import { RESET, register } from '../../redux/features/auth/authSlice';
 
 const initialState = {
     name: "",
@@ -19,11 +22,14 @@ const initialState = {
 const Register = () => {
     const [formData, setFormData] = useState(initialState);
     const {name, email, password, password2} = formData;
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [uCase, setUCase] = useState(false);
     const [num, setNum] = useState(false);
     const [sChar, setSChar] = useState(false);
     const [passLength, setPassLength] = useState(false);
+    const {isLoading, isLoggedIn, isSuccess, message} = useSelector((state) => state.auth);
 
     const timesIcon = <FaTimes color="red" size={15} />
     const checkIcon = <BsCheck2All color="green" size={15} />
@@ -71,7 +77,7 @@ const Register = () => {
         }
     }, [password])
 
-    const registerUser = (e) => {
+    const registerUser = async (e) => {
         e.preventDefault();
 
         if (!name || !email || !password) {
@@ -92,8 +98,15 @@ const Register = () => {
 
         const userData = { name, email, password };
 
-        console.log(userData);
+        await dispatch(register(userData));
     }
+
+    useEffect(() => {
+        if (isSuccess && isLoggedIn) {
+            navigate("/profile");
+        }
+        dispatch(RESET());
+    }, [isLoggedIn, isSuccess, dispatch, navigate]);
 
   return (
     <div className={`container ${styles.auth}`}>
