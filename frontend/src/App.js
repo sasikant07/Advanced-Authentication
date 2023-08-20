@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import axios from "axios";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from "react-redux";
 
 import Home from "./pages/home/Home";
 import Layout from "./components/layout/Layout";
@@ -14,10 +16,17 @@ import Profile from "./pages/profile/Profile";
 import Verify from "./pages/auth/Verify";
 import ChangePassword from "./pages/changePassword/ChangePassword";
 import UserList from "./pages/userList/UserList";
+import { getLoginStatus } from "./redux/features/auth/authSlice";
 
 axios.defaults.withCredentials = true;
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getLoginStatus());
+  }, [dispatch]);
+  
   return (
     <>
       <BrowserRouter>
