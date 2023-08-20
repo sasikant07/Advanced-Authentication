@@ -16,8 +16,43 @@ const register = async (userData) => {
     return response.data;
 };
 
+// Login User
+const login = async (userData) => {
+  const response = await axios.post(API_URL + "login", userData);
+  return response.data;
+};
+
+// Logout User
+const logout = async () => {
+  const response = await axios.get(API_URL + "logout");
+  return response.data.message;
+};
+
+// Get Login Sttaus 
+const getLoginStatus = async () => {
+  const response = await axios.get(API_URL + "loginStatus");
+  return response.data;
+};
+
+// Get User Profile
+const getUser = async () => {
+  const response = await axios.get(API_URL + "getUser");
+  return response.data;
+};
+
+// Update Profile
+const updateUser = async (userData) => {
+  const response = await axios.patch(API_URL + "updateUser", userData);
+  return response.data;
+};
+
 const authService = {
     register,
+    login,
+    logout,
+    getLoginStatus,
+    getUser,
+    updateUser,
 }
 
 export default authService;
