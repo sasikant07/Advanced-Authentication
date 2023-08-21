@@ -10,7 +10,7 @@ import styles from "./auth.module.scss";
 import Card from '../../components/card/Card';
 import PasswordInput from '../../components/passwordInput/PasswordInput';
 import { validateEmail } from '../../redux/features/auth/authService';
-import { RESET, register } from '../../redux/features/auth/authSlice';
+import { RESET, register, sendVerificationEmail } from '../../redux/features/auth/authSlice';
 import Loader from "../../components/loader/Loader";
 
 const initialState = {
@@ -100,6 +100,7 @@ const Register = () => {
         const userData = { name, email, password };
 
         await dispatch(register(userData));
+        await dispatch(sendVerificationEmail());
     }
 
     useEffect(() => {
