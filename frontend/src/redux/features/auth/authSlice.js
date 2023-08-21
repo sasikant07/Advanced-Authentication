@@ -58,7 +58,7 @@ export const getLoginStatus = createAsyncThunk("auth/getLoginStatus", async (_, 
   }
 });
 
-// Get Login Status
+// Get User
 export const getUser = createAsyncThunk("auth/getUser", async (_, thunkAPI) => {
   try {
     return await authService.getUser();
@@ -73,6 +73,17 @@ export const getUser = createAsyncThunk("auth/getUser", async (_, thunkAPI) => {
 export const updateUser = createAsyncThunk("auth/updateUser", async (userData, thunkAPI) => {
   try {
     return await authService.updateUser(userData);
+  } catch (error) {
+    const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+// Send Verification Email
+export const sendVerificationEmail = createAsyncThunk("auth/sendVerificationEmail", async (_, thunkAPI) => {
+  try {
+    return await authService.sendVerificationEmail();
   } catch (error) {
     const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
 
@@ -173,6 +184,7 @@ const authSlice = createSlice({
     builder.addCase(getUser.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isSuccess = true;
+      state.isLoggedIn = true;
       state.user = action.payload;
     });
     builder.addCase(getUser.rejected, (state, action) => {
@@ -189,9 +201,28 @@ const authSlice = createSlice({
     builder.addCase(updateUser.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isSuccess = true;
+      state.isLoggedIn = true;
       state.user = action.payload;
+      toast.success("User Updated Successfully");
     });
     builder.addCase(updateUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.message = action.payload;
+      toast.error(action.payload);
+    });
+
+    // Send Verfication Email
+    builder.addCase(sendVerificationEmail.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(sendVerificationEmail.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.message = action.payload;
+      toast.success(action.payload);
+    });
+    builder.addCase(sendVerificationEmail.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.message = action.payload;

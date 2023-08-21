@@ -6,6 +6,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { RESET, logout } from '../../redux/features/auth/authSlice';
 import { ShowOnLogin, ShowOnLogout } from '../protect/hiddenLink';
+import { UserName } from '../../pages/profile/Profile';
 
 const activeLink = ({isActive}) => (isActive ? "active" : ""); 
 
@@ -35,7 +36,7 @@ const Header = () => {
                 <ShowOnLogin>
                     <li className="--flex-center">
                         <FaUserCircle size={20} />
-                        <p className="--color-white">Hi, Zino</p>
+                        <UserName />
                     </li>
                 </ShowOnLogin>
                 <ShowOnLogout>
