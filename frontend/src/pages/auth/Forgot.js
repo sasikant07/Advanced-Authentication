@@ -1,22 +1,42 @@
 import React, {useState} from 'react';
 import {AiOutlineMail} from "react-icons/ai";
 import {Link} from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+
 import styles from "./auth.module.scss";
 import Card from '../../components/card/Card';
+import { validateEmail } from '../../redux/features/auth/authService';
+import { RESET, forgotPassword } from '../../redux/features/auth/authSlice';
+import Loader from '../../components/loader/Loader';
 
 const Forgot = () => {
     const [email, setEmail] = useState("");
+    const dispatch = useDispatch();
+    const {isLoading} = useSelector((state) => state.auth);
     
-    const handleInputChange = (e) => {
-        
-    }
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
 
-    const loginUser = (e) => {
+        if (!email) {
+            return toast.error("Please enter an email");
+        }
 
+        if (!validateEmail(email)) {
+            return toast.error("Please enter a valid email");
+        }
+
+        const userData = {
+            email
+        }
+
+        await dispatch(forgotPassword(userData));
+        await dispatch(RESET());
     }
 
   return (
     <div className={`container ${styles.auth}`}>
+        {isLoading && <Loader />}
         <Card>
             <div className={styles.form}>
                 <div className="--flex-center">
@@ -24,13 +44,13 @@ const Forgot = () => {
                 </div>
                 <h2>Forgot Password</h2>
 
-                <form onSubmit={loginUser}>
+                <form onSubmit={handleForgotPassword}>
                     <input 
                         type="email" 
                         name="email" 
                         placeholder="Email" 
                         value={email} 
-                        onChange={handleInputChange} 
+                        onChange={(e) => setEmail(e.target.value)} 
                         required />
 
                     <button type="submit" className="--btn --btn-primary --btn-block">Get Reset Email</button>
