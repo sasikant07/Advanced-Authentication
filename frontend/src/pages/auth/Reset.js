@@ -1,9 +1,14 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {MdPassword} from "react-icons/md";
-import {Link} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {useSelector, useDispatch} from "react-redux";
+import { toast } from 'react-toastify';
+
 import styles from "./auth.module.scss";
 import Card from '../../components/card/Card';
 import PasswordInput from '../../components/passwordInput/PasswordInput';
+import Loader from '../../components/loader/Loader';
+import { RESET, resetPassword } from '../../redux/features/auth/authSlice';
 
 const initialState = {
     password: "",
@@ -13,17 +18,49 @@ const initialState = {
 const Reset = () => {
     const [formData, setFormData] = useState(initialState);
     const {password, password2} = formData;
+    const {isLoading, isLoggedIn, isSuccess, message} = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {resetToken} = useParams();
     
     const handleInputChange = (e) => {
-        
+        const {name, value} = e.target;
+        setFormData({ ...formData, [name]: value });
     }
 
-    const loginUser = (e) => {
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+
+        if (!password || !password2) {
+            return toast.error("All fields are required");
+        }
+
+        if (password !== password2) {
+            return toast.error("Password doesn't match");
+        }
+
+        if (password.length < 6) {
+            return toast.error("Password must be upto 6 char");
+        }
+
+        const userData = {
+            password,
+        }
+
+        await dispatch(resetPassword({userData, resetToken}));
 
     }
+
+    useEffect(() => {
+        if (isSuccess && message.includes("Reset Successfull")) {
+            navigate("/login");
+        }
+        dispatch(RESET());
+    }, [dispatch, navigate, message, isSuccess]);
 
   return (
     <div className={`container ${styles.auth}`}>
+        {isLoading && <Loader />}
         <Card>
             <div className={styles.form}>
                 <div className="--flex-center">
@@ -31,7 +68,7 @@ const Reset = () => {
                 </div>
                 <h2>Reset Password</h2>
 
-                <form onSubmit={loginUser}>
+                <form onSubmit={handleResetPassword}>
                     <PasswordInput 
                         name="password" 
                         placeholder="Password" 

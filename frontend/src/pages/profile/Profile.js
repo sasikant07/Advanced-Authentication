@@ -14,7 +14,7 @@ import Notification from '../../components/notification/Notification';
 const cloud_name = process.env.RAECT_APP_CLOUD_NAME;
 const upload_preset = process.env.RAECT_APP_UPLOAD_PRESET;
 
-const shortenText = (text, n) => {
+export const shortenText = (text, n) => {
   if (text.length > n) {
     const shortenedText = text.substring(0, n).concat("...");
 

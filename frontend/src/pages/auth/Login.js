@@ -62,7 +62,7 @@ const Login = () => {
                 </div>
                 <h2>Login</h2>
                 <div className="--flex-center">
-                    <buttton className="--btn --btn-google">Login With Google</buttton>
+                    <button className="--btn --btn-google">Login With Google</button>
                 </div>
                 <br />
                 <p className="--text-center --fw-bold">or</p>

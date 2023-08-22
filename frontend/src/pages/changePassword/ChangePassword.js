@@ -1,9 +1,17 @@
 import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 import Card from '../../components/card/Card';
 import profileImg from "../../assets/avatar.png";
 import "./ChangePassword.scss";
 import Pagemenu from '../../components/pageMenu/Pagemenu';
 import PasswordInput from '../../components/passwordInput/PasswordInput';
+import useRedirectLoggedOutUser from '../../customHook/useRedirectLoggedOutUser';
+import { RESET, changePassword, logout } from '../../redux/features/auth/authSlice';
+import { Spinner } from '../../components/loader/Loader';
+import { sendAutomatedEmail } from '../../redux/features/email/emailSlice';
 
 const initialState = {
     oldPassword: "",
@@ -12,11 +20,49 @@ const initialState = {
 }
 
 const ChangePassword = () => {
+  useRedirectLoggedOutUser("/login");
   const [formData, setFormData] = useState(initialState);
   const {oldPassword, password, password2} = formData;
+  const {isLoading, user} = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
+    const {name, value} = e.target;
+    setFormData({ ...formData, [name]: value });
+  }
 
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+
+    if (!oldPassword || !password || !password2) {
+      return toast.error("All fields are required");
+    }
+
+    if (password !== password2) {
+      return toast.error("Passwords doesn't match");
+    }
+
+    const userData = {
+      oldPassword,
+      password
+    }
+
+    const emailData = {
+      subject: "Password Changed - AUTH:Z",
+      send_to: user.email,
+      reply_to: "noreply@amazon.com",
+      template: "changePassword",
+      url: "/forgot"
+    }
+
+    await dispatch(changePassword(userData));
+    await dispatch(sendAutomatedEmail(emailData));
+    await dispatch(logout());
+    await dispatch(RESET());
+
+    navigate("/login");
   }
 
   return (
@@ -28,7 +74,7 @@ const ChangePassword = () => {
           <div className="--flex-start change-password">
             <Card cardClass={"card"}>
               <>
-                <form>
+                <form onSubmit={handleUpdatePassword}>
                   <p>
                     <label>Current Password:</label>
                     <PasswordInput 
@@ -56,7 +102,9 @@ const ChangePassword = () => {
                         onChange={handleInputChange}
                     />
                   </p>
-                  <button className="--btn --btn-danger --btn-block">Change Password</button>
+                  {isLoading ? <Spinner /> : (
+                    <button type="submit" className="--btn --btn-danger --btn-block">Change Password</button>
+                  )}
                 </form>
               </>
             </Card>
