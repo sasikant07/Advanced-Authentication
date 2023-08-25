@@ -82,6 +82,18 @@ const getUsers = async () => {
   return response.data;
 };
 
+// Delete Users
+const deleteUser = async (id) => {
+  const response = await axios.delete(API_URL + id);
+  return response.data.message;
+};
+
+// Upgrade User ---> Change User Role
+const upgradeUser = async (userData) => {
+  const response = await axios.post(API_URL + "upgradeUser", userData);
+  return response.data.message;
+};
+
 const authService = {
     register,
     login,
@@ -95,6 +107,8 @@ const authService = {
     forgotPassword,
     resetPassword,
     getUsers,
+    deleteUser,
+    upgradeUser,
 }
 
 export default authService;
