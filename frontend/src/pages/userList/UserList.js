@@ -3,6 +3,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import ReactPaginate from 'react-paginate';
 
 import "./UserList.scss";
 import Pagemenu from "../../components/pageMenu/Pagemenu";
@@ -52,6 +53,24 @@ const UserList = () => {
     dispatch(FILTER_USERS({users, search}));
   }, [dispatch, users, search]);
 
+  // Begin Pagination
+  const itemsPerPage = 5;
+    const [itemOffset, setItemOffset] = useState(0);
+    const endOffset = itemOffset + itemsPerPage;
+    const currentItems = filteredUsers.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(filteredUsers.length / itemsPerPage);
+
+    // Invoke when user click to request another page.
+    const handlePageClick = (event) => {
+      const newOffset = (event.selected * itemsPerPage) % filteredUsers.length;
+      console.log(
+        `User requested page number ${event.selected}, which is offset ${newOffset}`
+      );
+      setItemOffset(newOffset);
+    };
+
+  // End Pagination
+
   return (
     <section>
       <div className="container">
@@ -85,7 +104,7 @@ const UserList = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user, index) => {
+                  {currentItems.map((user, index) => {
                     const {_id, name, email, role} = user;
                     return (
                       <tr key={_id}>
@@ -107,7 +126,22 @@ const UserList = () => {
                 </tbody>
               </table>
             )}
+            <hr />
           </div>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel="Next"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={pageCount}
+            previousLabel="Prev"
+            renderOnZeroPageCount={null}
+            containerClassName="pagination"
+            pageLinkClassName="page-num"
+            nextLinkClassName="page-num"
+            previousLinkClassName="page-num"
+            activeLinkClassName="activePage"
+          />
         </div>
       </div>
     </section>
