@@ -3,12 +3,13 @@ import {BiLogIn} from "react-icons/bi";
 import {Link, useNavigate} from "react-router-dom";
 import { toast } from 'react-toastify';
 import {useSelector, useDispatch} from "react-redux";
+import { GoogleLogin } from '@react-oauth/google';
 
 import styles from "./auth.module.scss";
 import Card from '../../components/card/Card';
 import PasswordInput from '../../components/passwordInput/PasswordInput';
 import { validateEmail } from '../../redux/features/auth/authService';
-import { RESET, login } from '../../redux/features/auth/authSlice';
+import { RESET, login, loginWithGoogle, sendLoginCode } from '../../redux/features/auth/authSlice';
 import Loader from '../../components/loader/Loader';
 
 const initialState = {
@@ -19,7 +20,7 @@ const initialState = {
 const Login = () => {
     const [formData, setFormData] = useState(initialState);
     const {email, password} = formData;
-    const {isLoading, isLoggedIn, isSuccess, message} = useSelector((state) => state.auth);
+    const {isLoading, isLoggedIn, isSuccess, message, isError, twoFactor} = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -49,8 +50,18 @@ const Login = () => {
         if (isSuccess && isLoggedIn) {
             navigate("/profile");
         }
+
+        if (isError && twoFactor) {
+            dispatch(sendLoginCode(email));
+            navigate(`/loginWithCode/${email}`);
+        }
+
         dispatch(RESET());
-    }, [isLoggedIn, isSuccess, dispatch, navigate]);
+    }, [isLoggedIn, isSuccess, dispatch, navigate, isError, twoFactor, email]);
+
+    const googleLogin = async (credentialResponse) => {
+        await dispatch(loginWithGoogle({userToken: credentialResponse.credential}));
+    }
 
   return (
     <div className={`container ${styles.auth}`}>
@@ -62,7 +73,14 @@ const Login = () => {
                 </div>
                 <h2>Login</h2>
                 <div className="--flex-center">
-                    <button className="--btn --btn-google">Login With Google</button>
+                    {/* <button className="--btn --btn-google">Login With Google</button> */}
+                    <GoogleLogin
+                        onSuccess={googleLogin}
+                        onError={() => {
+                            console.log('Login Failed');
+                            toast.error("Login Failed");
+                        }}
+                    />
                 </div>
                 <br />
                 <p className="--text-center --fw-bold">or</p>

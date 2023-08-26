@@ -1,8 +1,10 @@
-import React from 'react';
-import "./UserStats.scss";
-import InfoBox from '../infoBox/InfoBox';
+import React, { useEffect } from 'react';
 import { FaUsers } from 'react-icons/fa';
 import { BiUserCheck, BiUserMinus, BiUserX } from 'react-icons/bi';
+import { useDispatch, useSelector } from 'react-redux';
+import "./UserStats.scss";
+import InfoBox from '../infoBox/InfoBox';
+import { CALC_SUSPENDED_USER, CALC_VERIFIED_USER } from '../../redux/features/auth/authSlice';
 
 // Icons
 const icon1 = <FaUsers size={40} color='#fff' />
@@ -11,14 +13,24 @@ const icon3 = <BiUserMinus size={40} color='#fff' />
 const icon4 = <BiUserX size={40} color='#fff' />
 
 const UserStats = () => {
+  const {users, verifiedUsers, suspendedUsers} = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  const unVerifiedUsers = users.length - verifiedUsers;
+
+  useEffect(() => {
+    dispatch(CALC_VERIFIED_USER());
+    dispatch(CALC_SUSPENDED_USER());
+  }, [dispatch, users]);
+
   return (
     <div className="user-summary">
         <h3 className="--mt">User Stats</h3>
         <div className="info-summary">
-            <InfoBox icon={icon1} title={"Total Users"} count={"3"} bgColor="card1" />
-            <InfoBox icon={icon2} title={"Verified Users"} count={"3"} bgColor="card2" />
-            <InfoBox icon={icon3} title={"Unverified Users"} count={"3"} bgColor="card3" />
-            <InfoBox icon={icon4} title={"Suspended Users"} count={"3"} bgColor="card4" />
+            <InfoBox icon={icon1} title={"Total Users"} count={users.length} bgColor="card1" />
+            <InfoBox icon={icon2} title={"Verified Users"} count={verifiedUsers} bgColor="card2" />
+            <InfoBox icon={icon3} title={"Unverified Users"} count={unVerifiedUsers} bgColor="card3" />
+            <InfoBox icon={icon4} title={"Suspended Users"} count={suspendedUsers} bgColor="card4" />
         </div>
     </div>
   )

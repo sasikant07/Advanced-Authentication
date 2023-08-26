@@ -17,7 +17,8 @@ import {
     resetPassword,
     changePassword,
     sendLoginCode,
-    loginWithCode
+    loginWithCode,
+    loginWithGoogle
 } from "../controllers/userController.js";
 import { adminOnly, authorOnly, protect } from "../middleware/authMiddleware.js";
 
@@ -42,6 +43,9 @@ router.patch("/changePassword", protect, changePassword);
 
 router.post("/sendLoginCode/:email", sendLoginCode);
 router.post("/loginWithCode/:email", loginWithCode);
+
+// Google Login Routes
+router.post("/google/callback", loginWithGoogle);
 
 
 export default router;

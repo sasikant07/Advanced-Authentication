@@ -4,6 +4,7 @@ import parser from "ua-parser-js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import Cryptr from "cryptr";
+import {OAuth2Client} from "google-auth-library";
 
 import User from "../models/userModel.js";
 import { generateToken, hashToken } from "../utlls/index.js";
@@ -11,6 +12,7 @@ import sendEmail from "../utlls/sendEmail.js";
 import Token from "../models/tokenModel.js";
 
 const cryptr = new Cryptr(`${process.env.CRYPTR_KEY}`);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Register User
 export const registerUser = asyncHandler(async (req, res) => {
@@ -598,5 +600,80 @@ export const changePassword = asyncHandler (async (req, res) => {
     } else {
         res.status(400);
         throw new Error("Old Password is incorrect!");
+    }
+});
+
+// Login With Google
+export const loginWithGoogle = asyncHandler(async (req, res) => {
+    const {userToken} = req.body;
+
+    const ticket = await client.verifyIdToken({
+        idToken: userToken,
+        audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+
+    const {name, email, picture, sub} = payload;
+    const password = Date.now() + sub;
+
+
+    // Get User Agent
+    const ua = parser(req.headers["user-agent"]);
+    const userAgent = [ua.ua];
+
+    // Check if user exists
+    const user = await User.findOne({email});
+
+    if (!user) {
+        // Create new user
+        const newUser = await User.create({
+            name,
+            email,
+            password,
+            photo: picture,
+            isVerified: true,
+            userAgent
+        });
+
+        if (newUser) {
+            // Generate Token
+            const token = generateToken(newUser._id);
+    
+            // Send HTTP-only cookie
+            res.cookie("token", token, {
+                path: "/",
+                httpOnly: true,
+                expires: new Date(Date.now() + 1000 * 86400),      // 1 day
+                sameSite: "none",
+                secure: true,
+            });
+
+            const {_id, name, email, phone, bio, photo, role, isVerified} = newUser;
+    
+            res.status(201).json({
+                _id, name, email, phone, bio, photo, role, isVerified, token
+            })
+        }
+    }
+
+    // User Exists, Login
+    if (user) {
+        const token = generateToken(user._id);
+    
+        // Send HTTP-only cookie
+        res.cookie("token", token, {
+            path: "/",
+            httpOnly: true,
+            expires: new Date(Date.now() + 1000 * 86400),      // 1 day
+            sameSite: "none",
+            secure: true,
+        });
+
+        const {_id, name, email, phone, bio, photo, role, isVerified} = user;
+    
+        res.status(201).json({
+            _id, name, email, phone, bio, photo, role, isVerified, token
+        })
     }
 });

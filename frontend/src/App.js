@@ -4,6 +4,7 @@ import axios from "axios";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from "react-redux";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import Home from "./pages/home/Home";
 import Layout from "./components/layout/Layout";
@@ -37,6 +38,7 @@ function App() {
     <>
       <BrowserRouter>
         <ToastContainer />
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
         <Routes>
           <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/login" element={<Login />} />
@@ -49,6 +51,7 @@ function App() {
           <Route path="/changePassword" element={<Layout><ChangePassword /></Layout>} />
           <Route path="/users" element={<Layout><UserList /></Layout>} />
         </Routes>
+        </GoogleOAuthProvider>;
       </BrowserRouter>
     </>
   );
