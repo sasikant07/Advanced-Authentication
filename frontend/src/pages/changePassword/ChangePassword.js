@@ -75,7 +75,7 @@ const ChangePassword = () => {
             <Card cardClass={"card"}>
               <>
                 <form onSubmit={handleUpdatePassword}>
-                  <p>
+                  <div>
                     <label>Current Password:</label>
                     <PasswordInput 
                         name="oldPassword" 
@@ -83,8 +83,8 @@ const ChangePassword = () => {
                         value={oldPassword} 
                         onChange={handleInputChange}
                     />
-                  </p>
-                  <p>
+                  </div>
+                  <div>
                     <label>New Password:</label>
                     <PasswordInput 
                         name="password" 
@@ -92,8 +92,8 @@ const ChangePassword = () => {
                         value={password} 
                         onChange={handleInputChange}
                     />
-                  </p>
-                  <p>
+                  </div>
+                  <div>
                     <label>Confirm New Password:</label>
                     <PasswordInput 
                         name="password2" 
@@ -101,7 +101,7 @@ const ChangePassword = () => {
                         value={password2} 
                         onChange={handleInputChange}
                     />
-                  </p>
+                  </div>
                   {isLoading ? <Spinner /> : (
                     <button type="submit" className="--btn --btn-danger --btn-block">Change Password</button>
                   )}

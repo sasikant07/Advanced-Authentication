@@ -26,7 +26,7 @@ export const shortenText = (text, n) => {
 
 const Profile = () => {
   useRedirectLoggedOutUser("/login");
-  const {isLoading, isLoggedIn, isSuccess, message, user} = useSelector((state) => state.auth);
+  const {isLoading, user} = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const initialState = {
@@ -66,11 +66,11 @@ const Profile = () => {
       if (profileImage !== null && (profileImage.type === "image/jpeg" || profileImage.type === "image/jpg" || profileImage.type === "image/png")) {
         const image = new FormData();
         image.append("file", profileImage);
-        image.append("cloud_name", cloud_name);
-        image.append("upload_preset", upload_preset);
+        image.append("cloud_name", "mern-app-07");
+        image.append("upload_preset", "mern-app");
 
         // Save image to Cloudinary
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,{method: "post", body: image});
+        const response = await fetch(`https://api.cloudinary.com/v1_1/mern-app-07/image/upload`,{method: "post", body: image});
         const imgData = await response.json();
         imageURL = imgData.url.toString();
       }
